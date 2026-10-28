@@ -32,6 +32,13 @@ export const getHistoryByEquipmentId = async (equipmentId) => {
   return EquipmentHistory.findAll({ where: { equipmentId }, order: [['id', 'ASC']] });
 };
 
+export const findUnmatchedHistory = async () => {
+  return EquipmentHistory.findAll({
+    where: { isUnmatched: true },
+    order: [['id', 'ASC']],
+  });
+};
+
 export const createHistory = async (data) => {
   return EquipmentHistory.create(data);
 };
