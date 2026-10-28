@@ -3,6 +3,7 @@ import cors from 'cors';
 import helmet from 'helmet';
 import pino from 'pino';
 import { pinoHttp } from 'pino-http';
+import routes from "./routes/index.js";
 
 const app = express();
 
@@ -29,6 +30,8 @@ app.get('/api/health', (_req, res) => {
     message: 'API is running',
   });
 });
+
+app.use("/api", routes);
 
 export default app;
 
