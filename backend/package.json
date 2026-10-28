@@ -16,6 +16,7 @@
     "prepare": "husky",
     "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint:fix": "eslint . --fix",
+    "migrate": "npx sequelize-cli db:migrate",
     "format:check": "prettier --check ."
   },
   "dependencies": {
