@@ -18,9 +18,7 @@ export const getById = async (req, res, next) => {
     const equipment = await equipmentRepository.findById(req.params.id);
 
     if (!equipment) {
-      return res.status(404).json({
-        message: "Оборудование не найдено",
-      });
+      return next(new NotFoundError("Оборудование не найдено"));
     }
 
     res.status(200).json(equipment);
