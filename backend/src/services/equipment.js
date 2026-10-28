@@ -21,10 +21,7 @@ export const importFromFixedBook = async (filePath) => {
     contextOnly: 0,
   };
 
-  // Try to find relevant sheets - registry and history
-  // Use first sheets if names not obvious
   const sheets = workbook.SheetNames;
-  // Heuristic: look for sheets containing 'реестр', 'оборуд', 'истор'
   let registrySheet = null;
   let historySheet = null;
   for (const name of sheets) {
@@ -35,13 +32,10 @@ export const importFromFixedBook = async (filePath) => {
   if (!registrySheet && sheets.length > 0) registrySheet = sheets[0];
   if (!historySheet && sheets.length > 1) historySheet = sheets[1];
 
-  // Import registry
   if (registrySheet) {
     const data = xlsx.utils.sheet_to_json(workbook.Sheets[registrySheet], { defval: null });
-    // Find loading id column
     for (let i = 0; i < data.length; i++) {
       const row = data[i];
-      // look for key
       let loadingId = null;
       let loadingIdOriginal = null;
       for (const [k, v] of Object.entries(row)) {
@@ -68,7 +62,6 @@ export const importFromFixedBook = async (filePath) => {
           result.createdEquipment += 1;
         }
       } else {
-        // 40 строк иерархии без ID — контекст, а не дополнительные объекты
         await Equipment.create({
           loadingId: null,
           loadingIdOriginal: null,
@@ -82,7 +75,6 @@ export const importFromFixedBook = async (filePath) => {
     }
   }
 
-  // Import history
   if (historySheet) {
     const data = xlsx.utils.sheet_to_json(workbook.Sheets[historySheet], { defval: null });
     for (let i = 0; i < data.length; i++) {
@@ -100,7 +92,6 @@ export const importFromFixedBook = async (filePath) => {
         }
       }
       if (!loadingId) {
-        // try any column with id-like
         for (const [k, v] of Object.entries(row)) {
           if (typeof k === 'string' && k.toLowerCase().includes('id')) {
             loadingIdOriginal = v;
