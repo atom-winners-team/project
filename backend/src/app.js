@@ -74,3 +74,8 @@ app.use("/api", routes);
 export default app;
 
 // Это главный файл где мы подключаем все модули
+
+
+import equipmentRoutes from './routes/equipmentRoutes.js';
+
+app.use('/api/equipment', equipmentRoutes);
