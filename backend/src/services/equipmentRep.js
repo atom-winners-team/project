@@ -29,7 +29,7 @@ export const getHistory = async (id) => {
 };
 
 export const importBook = async (filePath) => {
-    return importFromFixedBook(filePath);
+    return equipmentService.importFromFixedBook(filePath);
 };
 
 export const getUnmatchedHistory = async () => {
