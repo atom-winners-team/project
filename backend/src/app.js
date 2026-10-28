@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import { randomUUID } from 'node:crypto';
 import { pinoHttp } from 'pino-http';
 import routes from "./routes/index.js";
+import authRoutes from "./routes/auth.js";
 import { logger } from './utils/logger.js';
 
 const app = express();
@@ -70,7 +71,8 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use("/api", routes);
-
-export default app;
+app.use(authRoutes);
 
 // Это главный файл где мы подключаем все модули
+
+export default app;

@@ -1,0 +1,26 @@
+import { DataTypes } from "sequelize";
+
+export const STATUSES = {
+  new: "new",
+  in_progress: "in_progress",
+  done: "done",
+};
+
+export const STATUSES_ENUM = DataTypes.ENUM(...Object.values(STATUSES));
+
+export const CREATION_TYPES = {
+  manual: "manual",
+  automatic: "automatic",
+};
+
+export const CREATION_TYPES_ENUM = DataTypes.ENUM(
+  ...Object.values(CREATION_TYPES),
+);
+
+export const USER_ROLES = {
+    duty: "duty",
+    engineer: "engineer",
+    director: "director",
+};
+
+export const USER_ROLES_ENUM = DataTypes.ENUM(...Object.values(USER_ROLES));
