@@ -5,36 +5,29 @@ export default (sequelize) => {
     'EquipmentHistory',
     {
       id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
+        type: DataTypes.INTEGER,
+        autoIncrement: true,
         primaryKey: true,
       },
-      equipment_id: {
-        type: DataTypes.UUID,
+      equipmentId: {
+        type: DataTypes.INTEGER,
         allowNull: true,
       },
-      external_id: {
+      loadingIdKey: {
         type: DataTypes.STRING,
         allowNull: true,
       },
-      state: {
-        type: DataTypes.STRING,
+      loadingIdOriginal: {
+        type: DataTypes.TEXT,
         allowNull: true,
       },
-      downtime_reason: {
-        type: DataTypes.STRING,
+      raw: {
+        type: DataTypes.JSONB,
         allowNull: true,
       },
-      work_performed: {
-        type: DataTypes.STRING,
-        allowNull: true,
-      },
-      work_end_date: {
-        type: DataTypes.DATEONLY,
-        allowNull: true,
-      },
-      is_mapped: {
+      isUnmatched: {
         type: DataTypes.BOOLEAN,
+        allowNull: false,
         defaultValue: false,
       },
     },
@@ -45,7 +38,7 @@ export default (sequelize) => {
   );
 
   EquipmentHistory.associate = (models) => {
-    EquipmentHistory.belongsTo(models.Equipment, { foreignKey: 'equipment_id' });
+    EquipmentHistory.belongsTo(models.Equipment, { foreignKey: 'equipmentId' });
   };
 
   return EquipmentHistory;

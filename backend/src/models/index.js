@@ -3,6 +3,7 @@ import process from 'process';
 import { createRequire } from 'module';
 import Equipment from './equipment.js';
 import EquipmentHistory from './equipmentHistory.js';
+import EquipmentImportReport from './equipmentImportReport.js';
 import DictPriorities from './dictPriorities.js';
 import DictRepairTypes from './dictRepairTypes.js';
 import DictStates from './dictStates.js';
@@ -27,6 +28,7 @@ db.sequelize = sequelize;
 
 db.Equipment = Equipment(sequelize);
 db.EquipmentHistory = EquipmentHistory(sequelize);
+db.EquipmentImportReport = EquipmentImportReport(sequelize);
 db.DictPriorities = DictPriorities(sequelize);
 db.DictRepairTypes = DictRepairTypes(sequelize);
 db.DictStates = DictStates(sequelize);
