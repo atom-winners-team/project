@@ -1,19 +1,98 @@
 import xlsx from 'xlsx';
-import fs from 'fs';
-import db from '../models/index.js';
+import fs from 'node:fs';
+import * as equipmentRepository from '../repositories/equipmentRepository.js';
+import { NotFoundError } from '../errors/NotFound.js';
 
-const { Equipment, EquipmentHistory, EquipmentImportReport } = db;
+export const getAll = () => equipmentRepository.findAll();
+export const getUnmatchedHistory = () => equipmentRepository.findUnmatchedHistory();
 
-function normalizeKey(val) {
-  if (val === null || val === undefined) return null;
-  return String(val).trim();
+export async function getById(id) {
+  const equipment = await equipmentRepository.findById(id);
+
+  if (!equipment) {
+    throw new NotFoundError('Оборудование не найдено');
+  }
+
+  return equipment;
 }
 
-export const importFromFixedBook = async (filePath) => {
+export async function getHistory(id) {
+  const equipment = await equipmentRepository.findById(id);
+
+  if (!equipment) {
+    throw new NotFoundError('Оборудование не найдено');
+  }
+
+  return equipmentRepository.getHistoryByEquipmentId(id);
+}
+
+function findSheets(names) {
+  let registry = names[0];
+  let history = names[1];
+
+  for (const name of names) {
+    const lower = name.toLowerCase();
+
+    if (lower.includes('реестр') || lower.includes('registry')) {
+      registry = name;
+    }
+
+    if (lower.includes('истор') || lower.includes('history')) {
+      history = name;
+    }
+  }
+
+  return { registry, history };
+}
+
+function readRows(workbook, sheetName) {
+  if (!sheetName) {
+    return [];
+  }
+
+  return xlsx.utils.sheet_to_json(workbook.Sheets[sheetName], {
+    defval: null
+  });
+}
+
+function normalizeId(value) {
+  return value === null || value === undefined
+      ? null
+      : String(value).trim();
+}
+
+function readLoadingId(row, allowIdFallback = false) {
+  const columns = Object.keys(row);
+
+  let column = columns.find((name) => {
+    const lower = name.toLowerCase();
+
+    return lower.includes('идентифик') && lower.includes('загруз');
+  });
+
+  let original = column === undefined ? null : row[column];
+  let key = normalizeId(original);
+
+  if (!key && allowIdFallback) {
+    column = columns.find((name) => name.toLowerCase().includes('id'));
+
+    if (column !== undefined) {
+      original = row[column];
+      key = normalizeId(original);
+    }
+  }
+
+  return { key, original };
+}
+
+export async function importFromFixedBook(filePath) {
   if (!fs.existsSync(filePath)) {
     throw new Error('Book file not found');
   }
+
   const workbook = xlsx.readFile(filePath);
+  const sheets = findSheets(workbook.SheetNames);
+
   const result = {
     matched: 0,
     unmatched: 0,
@@ -21,120 +100,52 @@ export const importFromFixedBook = async (filePath) => {
     contextOnly: 0,
   };
 
-  const sheets = workbook.SheetNames;
-  let registrySheet = null;
-  let historySheet = null;
-  for (const name of sheets) {
-    const lower = name.toLowerCase();
-    if (lower.includes('реестр') || lower.includes('registry')) registrySheet = name;
-    if (lower.includes('истор') || lower.includes('history')) historySheet = name;
-  }
-  if (!registrySheet && sheets.length > 0) registrySheet = sheets[0];
-  if (!historySheet && sheets.length > 1) historySheet = sheets[1];
+  for (const row of readRows(workbook, sheets.registry)) {
+    const { key, original } = readLoadingId(row);
 
-  if (registrySheet) {
-    const data = xlsx.utils.sheet_to_json(workbook.Sheets[registrySheet], { defval: null });
-    for (let i = 0; i < data.length; i++) {
-      const row = data[i];
-      let loadingId = null;
-      let loadingIdOriginal = null;
-      for (const [k, v] of Object.entries(row)) {
-        if (typeof k === 'string') {
-          const kl = k.toLowerCase();
-          if (kl.includes('идентифик') && kl.includes('загруз')) {
-            loadingIdOriginal = v;
-            loadingId = normalizeKey(v);
-            break;
-          }
-        }
-      }
-      if (loadingId) {
-        const exists = await Equipment.findOne({ where: { loadingId } });
-        if (!exists) {
-          await Equipment.create({
-            loadingId,
-            loadingIdOriginal,
-            name: row['Наименование'] || row['name'] || row['Название'] || null,
-            attributes: row,
-            rawRow: row,
-            isContextOnly: false,
-          });
-          result.createdEquipment += 1;
-        }
-      } else {
-        await Equipment.create({
-          loadingId: null,
-          loadingIdOriginal: null,
-          name: row['Наименование'] || row['name'] || row['Название'] || null,
-          attributes: row,
-          rawRow: row,
-          isContextOnly: true,
-        });
-        result.contextOnly += 1;
-      }
+    if (key && await equipmentRepository.findByLoadingIdString(key)) {
+      continue;
+    }
+
+    await equipmentRepository.create({
+      loadingId: key || null,
+      loadingIdOriginal: key ? original : null,
+      name: row['Наименование'] || row.name || row['Название'] || null,
+      attributes: row,
+      rawRow: row,
+      isContextOnly: !key,
+    });
+
+    if (key) {
+      result.createdEquipment += 1;
+    } else {
+      result.contextOnly += 1;
     }
   }
 
-  if (historySheet) {
-    const data = xlsx.utils.sheet_to_json(workbook.Sheets[historySheet], { defval: null });
-    for (let i = 0; i < data.length; i++) {
-      const row = data[i];
-      let loadingId = null;
-      let loadingIdOriginal = null;
-      for (const [k, v] of Object.entries(row)) {
-        if (typeof k === 'string') {
-          const kl = k.toLowerCase();
-          if (kl.includes('идентифик') && kl.includes('загруз')) {
-            loadingIdOriginal = v;
-            loadingId = normalizeKey(v);
-            break;
-          }
-        }
-      }
-      if (!loadingId) {
-        for (const [k, v] of Object.entries(row)) {
-          if (typeof k === 'string' && k.toLowerCase().includes('id')) {
-            loadingIdOriginal = v;
-            loadingId = normalizeKey(v);
-            break;
-          }
-        }
-      }
-      if (loadingId) {
-        const eq = await Equipment.findOne({ where: { loadingId } });
-        if (eq) {
-          await EquipmentHistory.create({
-            equipmentId: eq.id,
-            loadingIdKey: loadingId,
-            loadingIdOriginal,
-            raw: row,
-            isUnmatched: false,
-          });
-          result.matched += 1;
-        } else {
-          await EquipmentHistory.create({
-            equipmentId: null,
-            loadingIdKey: loadingId,
-            loadingIdOriginal,
-            raw: row,
-            isUnmatched: true,
-          });
-          result.unmatched += 1;
-        }
-      } else {
-        await EquipmentHistory.create({
-          equipmentId: null,
-          loadingIdKey: null,
-          loadingIdOriginal: null,
-          raw: row,
-          isUnmatched: true,
-        });
-        result.unmatched += 1;
-      }
+  for (const row of readRows(workbook, sheets.history)) {
+    const { key, original } = readLoadingId(row, true);
+
+    const equipment = key
+        ? await equipmentRepository.findByLoadingIdString(key)
+        : null;
+
+    await equipmentRepository.createHistory({
+      equipmentId: equipment ? equipment.id : null,
+      loadingIdKey: key || null,
+      loadingIdOriginal: key ? original : null,
+      raw: row,
+      isUnmatched: !equipment,
+    });
+
+    if (equipment) {
+      result.matched += 1;
+    } else {
+      result.unmatched += 1;
     }
   }
 
-  await EquipmentImportReport.create({
+  await equipmentRepository.createImportReport({
     unmatchedCount: result.unmatched,
     unmatchedMissingIdsCount: result.unmatched,
     matchedCount: result.matched,
@@ -142,4 +153,4 @@ export const importFromFixedBook = async (filePath) => {
   });
 
   return result;
-};
+}
