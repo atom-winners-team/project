@@ -7,7 +7,9 @@ export const findById = async (id) => {
 };
 
 export const findByUsername = async (username) => {
-  return User.findOne({ where: { username } });
+  return User.findOne({
+    where: { login: username },
+  });
 };
 
 export const findAll = async () => {
