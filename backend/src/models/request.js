@@ -14,6 +14,10 @@ export default (sequelize) => {
         type: DataTypes.UUID,
         allowNull: true,
       },
+      equipment_ref_id: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
       type: {
         type: CREATION_TYPES_ENUM,
         allowNull: false,
@@ -55,7 +59,7 @@ export default (sequelize) => {
   );
 
   Request.associate = (models) => {
-    Request.belongsTo(models.Equipment, { foreignKey: "equipment_id" });
+    Request.belongsTo(models.Equipment, { foreignKey: "equipment_ref_id" });
     Request.belongsTo(models.User, { as: "author", foreignKey: "author_id" });
     Request.belongsTo(models.User, {
       as: "assignee",

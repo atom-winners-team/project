@@ -1,6 +1,7 @@
 import { AppError } from '../errors/AppError.js';
 import { NotFoundError } from '../errors/NotFound.js';
 import * as requestRepository from '../repositories/requestRepository.js';
+import * as equipmentRepository from '../repositories/equipmentRepository.js';
 import * as userRepository from '../repositories/userRepository.js';
 
 const requestTypes = new Set(['inspection', 'repair']);
@@ -13,6 +14,7 @@ const requestStatuses = new Set([
 ]);
 const requestFields = [
   'equipment_id',
+  'equipment_ref_id',
   'type',
   'priority_id',
   'description',
@@ -21,6 +23,8 @@ const requestFields = [
 ];
 
 const badRequest = (message) => new AppError(message, 400, 'INVALID_REQUEST');
+const requestIdPattern =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const validateData = (data) => {
   if (data === null || typeof data !== 'object' || Array.isArray(data)) {
@@ -43,6 +47,10 @@ const validateStatus = (status) => {
 const getActorId = (user) => user?.id ?? user?.userId ?? user?.sub ?? null;
 
 const getRequestOrThrow = async (id) => {
+  if (typeof id !== 'string' || !requestIdPattern.test(id)) {
+    throw badRequest('Некорректный ID заявки');
+  }
+
   const request = await requestRepository.findById(id);
 
   if (!request) {
@@ -50,6 +58,21 @@ const getRequestOrThrow = async (id) => {
   }
 
   return request;
+};
+
+const validateEquipmentReference = async (data) => {
+  if (!Object.hasOwn(data, 'equipment_ref_id') || data.equipment_ref_id === null) {
+    return;
+  }
+
+  if (!Number.isInteger(data.equipment_ref_id) || data.equipment_ref_id < 1) {
+    throw badRequest('equipment_ref_id должен быть положительным целым числом');
+  }
+
+  const equipment = await equipmentRepository.findById(data.equipment_ref_id);
+  if (!equipment) {
+    throw new NotFoundError('Оборудование не найдено');
+  }
 };
 
 const pickRequestFields = (data) => {
@@ -100,6 +123,7 @@ export const requestService = {
   async create(data, user) {
     validateData(data);
     validateType(data.type);
+    await validateEquipmentReference(data);
 
     const values = pickRequestFields(data);
     values.author_id = getActorId(user);
@@ -110,6 +134,7 @@ export const requestService = {
   async update(id, data) {
     validateData(data);
     const request = await getRequestOrThrow(id);
+    await validateEquipmentReference(data);
     const values = pickRequestFields(data);
 
     if (Object.hasOwn(values, 'type')) {

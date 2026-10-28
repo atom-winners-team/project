@@ -5,6 +5,12 @@ export const createRequestSchema = z.object({
 
     equipment_id: z.string().uuid().nullable().optional(),
 
+    equipment_ref_id: z.number()
+        .int()
+        .positive()
+        .nullable()
+        .optional(),
+
     type: z.enum([
         'inspection',
         'repair',

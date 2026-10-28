@@ -24,6 +24,16 @@
 `POST /api/equipment/import` с body `{ "filePath": "path/to/book.xlsx" }`
 Или через сервис `importFromFixedBook(filePath)` из `src/services/equipment.js`.
 
+Для полного импорта книги вместе со справочниками и иерархией:
+1. Установите Python-зависимости: `python -m pip install -r requirements.txt`
+2. Примените миграции: `npx sequelize-cli db:migrate`
+3. Запустите из каталога `backend`: `python scripts/parse_exel_file.py`
+
+Скрипт по умолчанию использует `data/Оборудование.xlsx` и настройки PostgreSQL
+из `backend/.env` (`PG_DATABASE`, `PG_USER`, `PG_PASSWORD`, опционально
+`PG_HOST`, `PG_PORT`). Можно указать другую книгу позиционным аргументом или
+передать строку подключения через `--database-url` либо `DATABASE_URL`.
+
 ## Учётные записи (для демонстрации)
 - duty1 (Дежурный, duty_officer)
 - engineer1 (Сервисный инженер, service_engineer)

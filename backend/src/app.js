@@ -8,6 +8,8 @@ import authRoutes from "./routes/auth.js";
 import { logger } from './utils/logger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { config } from './config/index.js';
+import swaggerUi from 'swagger-ui-express';
+import { openapiSpec } from './docs/openapi.js';
 
 const app = express();
 
@@ -71,6 +73,11 @@ app.get('/api/health', (_req, res) => {
     message: 'API is running',
   });
 });
+
+app.get('/api-docs/openapi.json', (_req, res) => {
+  res.json(openapiSpec);
+});
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openapiSpec));
 
 app.use("/api", routes);
 app.use(authRoutes);

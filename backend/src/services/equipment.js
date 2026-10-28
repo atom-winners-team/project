@@ -1,13 +1,29 @@
 import xlsx from 'xlsx';
 import fs from 'node:fs';
 import * as equipmentRepository from '../repositories/equipmentRepository.js';
+import { AppError } from '../errors/AppError.js';
 import { NotFoundError } from '../errors/NotFound.js';
 
 export const getAll = () => equipmentRepository.findAll();
 export const getUnmatchedHistory = () => equipmentRepository.findUnmatchedHistory();
 
+function validateEquipmentId(id) {
+  const equipmentId = Number(id);
+
+  if (
+    !Number.isInteger(equipmentId) ||
+    equipmentId < 1 ||
+    equipmentId > 2_147_483_647
+  ) {
+    throw new AppError('Некорректный ID оборудования', 400, 'INVALID_ID');
+  }
+
+  return equipmentId;
+}
+
 export async function getById(id) {
-  const equipment = await equipmentRepository.findById(id);
+  const equipmentId = validateEquipmentId(id);
+  const equipment = await equipmentRepository.findById(equipmentId);
 
   if (!equipment) {
     throw new NotFoundError('Оборудование не найдено');
@@ -16,14 +32,20 @@ export async function getById(id) {
   return equipment;
 }
 
+function normalizeKey(val) {
+  if (val === null || val === undefined) return null;
+  return String(val).trim();
+}
+
 export async function getHistory(id) {
-  const equipment = await equipmentRepository.findById(id);
+  const equipmentId = validateEquipmentId(id);
+  const equipment = await equipmentRepository.findById(equipmentId);
 
   if (!equipment) {
     throw new NotFoundError('Оборудование не найдено');
   }
 
-  return equipmentRepository.getHistoryByEquipmentId(id);
+  return equipmentRepository.getHistoryByEquipmentId(equipmentId);
 }
 
 function findSheets(names) {
