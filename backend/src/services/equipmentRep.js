@@ -1,4 +1,4 @@
-import { importFromFixedBook } from './import.js';
+import * as equipmentService from '../repositories/equipmentRepository.js';
 import * as equipmentRepository from '../repositories/equipmentRepository.js';
 import { NotFoundError } from '../errors/NotFound.js';
 
