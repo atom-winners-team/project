@@ -19,3 +19,22 @@ export const findAll = async () => {
 export const create = async (data) => {
   return User.create(data);
 };
+
+export const update = async (id, data) => {
+  const [updatedCount, users] = await User.update(data, {
+    where: { id },
+    returning: true,
+  });
+
+  if (updatedCount === 0) {
+    return null;
+  }
+
+  return users[0];
+};
+
+export const remove = async (id) => {
+  return User.destroy({
+    where: { id },
+  });
+};
