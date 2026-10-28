@@ -1,6 +1,6 @@
 import db from '../models/index.js';
 
-const { Equipment, EquipmentHistory } = db;
+const { Equipment, EquipmentHistory, EquipmentImportReport } = db;
 
 export const findByLoadingIdString = async (loadingId) => {
   if (loadingId === null || loadingId === undefined) {
@@ -41,4 +41,8 @@ export const findUnmatchedHistory = async () => {
 
 export const createHistory = async (data) => {
   return EquipmentHistory.create(data);
+};
+
+export const createImportReport = async (data) => {
+  return EquipmentImportReport.create(data);
 };
