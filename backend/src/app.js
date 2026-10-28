@@ -6,6 +6,7 @@ import { pinoHttp } from 'pino-http';
 import routes from "./routes/index.js";
 import authRoutes from "./routes/auth.js";
 import { logger } from './utils/logger.js';
+import { errorHandler } from './middlewares/errorHandler.js';
 
 const app = express();
 
@@ -74,5 +75,5 @@ app.use("/api", routes);
 app.use(authRoutes);
 
 // Это главный файл где мы подключаем все модули
-
+app.use(errorHandler);
 export default app;

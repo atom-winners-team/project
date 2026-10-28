@@ -34,6 +34,8 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    volumes:
+      - ./src:/app/src
 
 volumes:
   pgdata:
