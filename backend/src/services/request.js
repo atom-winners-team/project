@@ -1,8 +1,7 @@
-import db from '../models/index.js';
 import { AppError } from '../errors/AppError.js';
 import { NotFoundError } from '../errors/NotFound.js';
-
-const { Request, User } = db;
+import * as requestRepository from '../repositories/requestRepository.js';
+import * as userRepository from '../repositories/userRepository.js';
 
 const requestTypes = new Set(['inspection', 'repair']);
 const requestStatuses = new Set([
@@ -44,7 +43,7 @@ const validateStatus = (status) => {
 const getActorId = (user) => user?.id ?? user?.userId ?? user?.sub ?? null;
 
 const getRequestOrThrow = async (id) => {
-  const request = await Request.findByPk(id);
+  const request = await requestRepository.findById(id);
 
   if (!request) {
     throw new NotFoundError('Заявка не найдена');
@@ -91,14 +90,11 @@ export const requestService = {
       validateStatus(where.status);
     }
 
-    return Request.findAll({
-      where,
-      order: [['createdAt', 'DESC']],
-    });
+    return requestRepository.findAll(where);
   },
 
   async getById(id) {
-    return Request.findByPk(id);
+    return requestRepository.findById(id);
   },
 
   async create(data, user) {
@@ -108,7 +104,7 @@ export const requestService = {
     const values = pickRequestFields(data);
     values.author_id = getActorId(user);
 
-    return Request.create(values);
+    return requestRepository.create(values);
   },
 
   async update(id, data) {
@@ -120,8 +116,7 @@ export const requestService = {
       validateType(values.type);
     }
 
-    await request.update(values);
-    return request;
+    return requestRepository.update(request, values);
   },
 
   async assign(id, data) {
@@ -134,14 +129,13 @@ export const requestService = {
     const assigneeId = data.assignee_id;
 
     if (assigneeId !== null) {
-      const assignee = await User.findByPk(assigneeId);
+      const assignee = await userRepository.findById(assigneeId);
       if (!assignee) {
         throw new NotFoundError('Исполнитель не найден');
       }
     }
 
-    await request.update({ assignee_id: assigneeId });
-    return request;
+    return requestRepository.update(request, { assignee_id: assigneeId });
   },
 
   async changeStatus(id, data) {
@@ -149,7 +143,6 @@ export const requestService = {
     validateStatus(data.status);
 
     const request = await getRequestOrThrow(id);
-    await request.update({ status: data.status });
-    return request;
+    return requestRepository.update(request, { status: data.status });
   },
 };
