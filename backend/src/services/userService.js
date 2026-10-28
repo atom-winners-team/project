@@ -4,7 +4,7 @@ import * as userRepository from '../repositories/userRepository.js';
 
 import { AppError } from '../errors/AppError.js';
 import { NotFoundError } from '../errors/NotFound.js';
-import { getAuthConfig } from '../config/auth.js';
+import { getAuthConfig } from '../config/index.js';
 
 const toPublicUser = (user) => {
     return {

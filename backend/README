@@ -6,10 +6,12 @@
 
 ## Настройка
 1. Установить зависимости: `npm install`
-2. Настроить `.env`: `PG_DATABASE`, `PG_USER`, `PG_PASSWORD`, `ACCESS_TOKEN_SECRET` (не менее 32 символов); опционально `PG_HOST`, `PG_PORT`, `ACCESS_TOKEN_TTL_SECONDS`, `BCRYPT_ROUNDS`
+2. Настроить `.env`: `PG_DATABASE`, `PG_USER`, `PG_PASSWORD`, `ACCESS_TOKEN_SECRET` (не менее 32 символов); опционально `PG_HOST`, `PG_PORT`, `PORT`, `CORS_ORIGINS`, `ACCESS_TOKEN_TTL_SECONDS`, `BCRYPT_ROUNDS`
 3. Запустить PostgreSQL: `docker compose up -d db`
 4. Применить миграции: `npx sequelize-cli db:migrate`
 5. Применить сиды (опционально): `npx sequelize-cli db:seed:all`
+
+Единственный конфиг приложения и Sequelize CLI: `src/config/index.js`.
 
 ## Авторизация
 - `POST /register` с `{ "login": "user1", "password": "минимум 8 символов" }` создаёт пользователя с ролью `duty`.

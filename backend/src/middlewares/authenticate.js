@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import { getAuthConfig } from "../config/auth.js";
+import { getAuthConfig } from "../config/index.js";
 import { UnauthorizedError } from "../errors/UnauthorizedError.js";
 import { findAuthenticatedUser } from "../services/auth.js";
 

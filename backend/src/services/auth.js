@@ -2,7 +2,7 @@ import { randomBytes } from "node:crypto";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { UniqueConstraintError } from "sequelize";
-import { getAuthConfig } from "../config/auth.js";
+import { getAuthConfig } from "../config/index.js";
 import { AppError } from "../errors/AppError.js";
 import { UnauthorizedError } from "../errors/UnauthorizedError.js";
 import { USER_ROLES } from "../models/constants.js";
