@@ -40,7 +40,7 @@ export const register = async ({ login, password }) => {
     const user = await create({
       login: normalizedLogin,
       password_hash: passwordHash,
-      role: USER_ROLES.duty,
+      role: USER_ROLES.engineer,
     });
     return publicUser(user);
   } catch (error) {

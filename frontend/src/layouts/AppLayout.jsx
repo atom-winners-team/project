@@ -8,8 +8,9 @@ import {
   LogoutOutlined,
   FireTwoTone,
 } from '@ant-design/icons';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { logout as logoutAction } from '../store/slices/authSlice.js';
+import { ROLE_LABELS, USER_ROLES } from '../auth/roles.js';
 import cl from './classes.module.scss';
 
 const { Header, Sider, Content } = Layout;
@@ -18,13 +19,22 @@ const navigation = [
   { key: '/', icon: <DashboardOutlined />, label: 'Главная' },
   { key: '/equipment', icon: <DeploymentUnitOutlined />, label: 'Оборудование' },
   { key: '/requests', icon: <FileTextOutlined />, label: 'Заявки' },
-  { key: '/users', icon: <TeamOutlined />, label: 'Пользователи' },
+  {
+    key: '/users',
+    icon: <TeamOutlined />,
+    label: 'Пользователи',
+    roles: [USER_ROLES.duty, USER_ROLES.director],
+  },
 ];
 
 export default function AppLayout() {
   const navigate = useNavigate();
   const location = useLocation();
   const dispatch = useDispatch();
+  const role = useSelector((state) => state.auth.user?.role);
+  const visibleNavigation = navigation.filter(
+    (item) => !item.roles || item.roles.includes(role),
+  );
 
   const handleLogout = () => {
     dispatch(logoutAction());
@@ -38,12 +48,13 @@ export default function AppLayout() {
         <Menu
           theme="dark"
           selectedKeys={[location.pathname]}
-          items={navigation}
+          items={visibleNavigation}
           onClick={({ key }) => navigate(key)}
         />
       </Sider>
       <Layout>
         <Header className={cl.appHeader}>
+          <span style={{ marginRight: 12 }}>{ROLE_LABELS[role] || 'Пользователь'}</span>
           <Button icon={<LogoutOutlined />} size="small" onClick={handleLogout}>Выйти</Button>
         </Header>
         <Content className={cl.pageContent}>

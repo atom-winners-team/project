@@ -1,6 +1,8 @@
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom';
 import AppLayout from '../layouts/AppLayout.jsx';
 import ProtectedRoute from '../components/ProtectedRoute.jsx';
+import RoleRoute from '../components/RoleRoute.jsx';
+import { USER_ROLES } from '../auth/roles.js';
 import DashboardPage from '../pages/dashboard/DashboardPage.jsx';
 import EquipmentPage from '../pages/EquipmentPage.jsx';
 import LoginPage from '../pages/login/LoginPage.jsx';
@@ -20,7 +22,9 @@ export default function AppRouter() {
             <Route index element={<DashboardPage />} />
             <Route path="equipment" element={<EquipmentPage />} />
             <Route path="requests" element={<RequestsPage />} />
-            <Route path="users" element={<UsersPage />} />
+            <Route element={<RoleRoute roles={[USER_ROLES.duty, USER_ROLES.director]} />}>
+              <Route path="users" element={<UsersPage />} />
+            </Route>
           </Route>
         </Route>
 

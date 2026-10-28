@@ -15,10 +15,12 @@ const normalizeEquipment = (items) => items.map((item, index) => ({
   key: item.id ?? index + 1,
   id: item.id,
   name: item.name || item.loadingIdOriginal || `Оборудование ${index + 1}`,
-  model: item.attributes?.model || item.attributes?.['Модель'] || 'Не указана',
-  location: item.attributes?.location || item.attributes?.['Площадка'] || 'Не указана',
-  power: item.attributes?.power || item.attributes?.['Мощность'] || 'Не указана',
-  status: item.status || 'В работе',
+  loadingId: item.loadingId,
+  inventoryNumber: item.inventory_number || item.attributes?.['Инвентарный №'] || '—',
+  typicalRepair: item.typical_repair_code || item.attributes?.['Типовой ОР'] || '—',
+  commissionedAt: item.commissioned_at || '—',
+  manufacturedAt: item.manufactured_at || '—',
+  isContextOnly: item.isContextOnly,
 }));
 
 export const equipmentService = {
@@ -27,4 +29,11 @@ export const equipmentService = {
     const data = await http.get('/equipment');
     return normalizeEquipment(Array.isArray(data) ? data : data.items || []);
   },
+  getById: async (id) => {
+    if (useDemoApi) return demoEquipment.find((item) => item.key === Number(id));
+    const item = await http.get(`/equipment/${id}`);
+    return normalizeEquipment([item])[0];
+  },
+  getHistory: (id) => useDemoApi ? Promise.resolve([]) : http.get(`/equipment/${id}/history`),
+  getUnmatchedHistory: () => useDemoApi ? Promise.resolve([]) : http.get('/equipment/history/unmatched'),
 };

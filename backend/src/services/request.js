@@ -1,5 +1,7 @@
 import { AppError } from '../errors/AppError.js';
+import { ForbiddenError } from '../errors/ForbiddenError.js';
 import { NotFoundError } from '../errors/NotFound.js';
+import { USER_ROLES } from '../models/constants.js';
 import * as requestRepository from '../repositories/requestRepository.js';
 import * as equipmentRepository from '../repositories/equipmentRepository.js';
 import * as userRepository from '../repositories/userRepository.js';
@@ -60,6 +62,15 @@ const getRequestOrThrow = async (id) => {
   return request;
 };
 
+const ensureAssignedEngineer = (request, user) => {
+  if (
+    user?.role === USER_ROLES.engineer &&
+    request.assignee_id !== getActorId(user)
+  ) {
+    throw new ForbiddenError('Инженер может работать только со своими заявками');
+  }
+};
+
 const validateEquipmentReference = async (data) => {
   if (!Object.hasOwn(data, 'equipment_ref_id') || data.equipment_ref_id === null) {
     return;
@@ -88,7 +99,7 @@ const pickRequestFields = (data) => {
 };
 
 export const requestService = {
-  async getAll(query = {}) {
+  async getAll(query = {}, user) {
     validateData(query);
 
     const where = {};
@@ -113,11 +124,17 @@ export const requestService = {
       validateStatus(where.status);
     }
 
+    if (user?.role === USER_ROLES.engineer) {
+      where.assignee_id = getActorId(user);
+    }
+
     return requestRepository.findAll(where);
   },
 
-  async getById(id) {
-    return getRequestOrThrow(id);
+  async getById(id, user) {
+    const request = await getRequestOrThrow(id);
+    ensureAssignedEngineer(request, user);
+    return request;
   },
 
   async create(data, user) {
@@ -131,9 +148,10 @@ export const requestService = {
     return requestRepository.create(values);
   },
 
-  async update(id, data) {
+  async update(id, data, user) {
     validateData(data);
     const request = await getRequestOrThrow(id);
+    ensureAssignedEngineer(request, user);
     await validateEquipmentReference(data);
     const values = pickRequestFields(data);
 
@@ -144,13 +162,14 @@ export const requestService = {
     return requestRepository.update(request, values);
   },
 
-  async assign(id, data) {
+  async assign(id, data, user) {
     validateData(data);
     if (!Object.hasOwn(data, 'assignee_id')) {
       throw badRequest('Не указан исполнитель заявки');
     }
 
     const request = await getRequestOrThrow(id);
+    ensureAssignedEngineer(request, user);
     const assigneeId = data.assignee_id;
 
     if (assigneeId !== null) {
@@ -158,16 +177,20 @@ export const requestService = {
       if (!assignee) {
         throw new NotFoundError('Исполнитель не найден');
       }
+      if (assignee.role !== USER_ROLES.engineer) {
+        throw badRequest('Исполнителем заявки может быть только инженер');
+      }
     }
 
     return requestRepository.update(request, { assignee_id: assigneeId });
   },
 
-  async changeStatus(id, data) {
+  async changeStatus(id, data, user) {
     validateData(data);
     validateStatus(data.status);
 
     const request = await getRequestOrThrow(id);
+    ensureAssignedEngineer(request, user);
     return requestRepository.update(request, { status: data.status });
   },
 };

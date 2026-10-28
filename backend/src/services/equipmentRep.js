@@ -1,8 +1,7 @@
-import * as equipmentRepository from '../repositories/equipment.js';
 import { importFromFixedBook } from './import.js';
-import { NotFoundError } from '../errors/NotFoundError.js';
+import * as equipmentRepository from '../repositories/equipmentRepository.js';
+import { NotFoundError } from '../errors/NotFound.js';
 
-// Получаем все оборудование
 export const getAll = async () => {
     const equipment = await equipmentRepository.findAll();
     if (!equipment || equipment.length === 0) {
@@ -13,7 +12,6 @@ export const getAll = async () => {
     return equipment;
 };
 
-// Получаем оборудование по id
 export const getById = async (id) => {
     const equipment = await equipmentRepository.findById(id);
     if (!equipment) {
@@ -22,9 +20,7 @@ export const getById = async (id) => {
     return equipment;
 };
 
-// Получаем историю оборудования по id
 export const getHistory = async (id) => {
-    // Сначала проверяем, что оборудование существует
     const equipment = await equipmentRepository.findById(id);
     if (!equipment) {
         throw new NotFoundError(`Оборудование с id=${id} не найдено`);
@@ -32,12 +28,10 @@ export const getHistory = async (id) => {
     return equipmentRepository.getHistoryByEquipmentId(id);
 };
 
-// Импортируем оборудование из файла
 export const importBook = async (filePath) => {
     return importFromFixedBook(filePath);
 };
 
-// Получаем историю оборудования без соответствия
 export const getUnmatchedHistory = async () => {
     return equipmentRepository.findUnmatchedHistory();
 };
