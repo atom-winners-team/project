@@ -1,9 +1,9 @@
 
-import * as requestsService from "../services/requests.js";
+import { requestService } from "../services/request.js";
 
 export const getAll = async (req, res, next) => {
   try {
-    const requests = await requestsService.getAll(req.query);
+    const requests = await requestService.getAll(req.query);
 
     res.status(200).json(requests);
   } catch (error) {
@@ -13,7 +13,7 @@ export const getAll = async (req, res, next) => {
 
 export const getById = async (req, res, next) => {
   try {
-    const request = await requestsService.getById(
+    const request = await requestService.getById(
       req.params.id
     );
 
@@ -29,7 +29,7 @@ export const getById = async (req, res, next) => {
 
 export const create = async (req, res, next) => {
   try {
-    const request = await requestsService.create(
+    const request = await requestService.create(
       req.body,
       req.user
     );
@@ -42,7 +42,7 @@ export const create = async (req, res, next) => {
 
 export const update = async (req, res, next) => {
   try {
-    const request = await requestsService.update(
+    const request = await requestService.update(
       req.params.id,
       req.body,
       req.user
@@ -57,7 +57,7 @@ export const update = async (req, res, next) => {
 
 export const assign = async (req, res, next) => {
   try {
-    const request = await requestsService.assign(
+    const request = await requestService.assign(
       req.params.id,
       req.body,
       req.user
@@ -71,7 +71,7 @@ export const assign = async (req, res, next) => {
 
 export const changeStatus = async (req, res, next) => {
   try {
-    const request = await requestsService.changeStatus(
+    const request = await requestService.changeStatus(
       req.params.id,
       req.body,
       req.user
