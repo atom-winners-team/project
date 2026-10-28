@@ -1,47 +1,55 @@
-import { NavLink, Outlet } from 'react-router-dom';
-import cl from './classes.module.scss'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
+import { Button, Layout, Menu } from 'antd';
+import {
+  DashboardOutlined,
+  DeploymentUnitOutlined,
+  FileTextOutlined,
+  TeamOutlined,
+  LogoutOutlined,
+  FireTwoTone,
+} from '@ant-design/icons';
+import { useDispatch } from 'react-redux';
+import { logout as logoutAction } from '../store/slices/authSlice.js';
+import cl from './classes.module.scss';
+
+const { Header, Sider, Content } = Layout;
 
 const navigation = [
-  { to: '/', label: 'Главная' },
-  { to: '/equipment', label: 'Оборудование' },
-  { to: '/requests', label: 'Заявки' },
-  { to: '/telemetry', label: 'Телеметрия' },
-  { to: '/users', label: 'Пользователи' },
+  { key: '/', icon: <DashboardOutlined />, label: 'Главная' },
+  { key: '/equipment', icon: <DeploymentUnitOutlined />, label: 'Оборудование' },
+  { key: '/requests', icon: <FileTextOutlined />, label: 'Заявки' },
+  { key: '/users', icon: <TeamOutlined />, label: 'Пользователи' },
 ];
 
 export default function AppLayout() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const dispatch = useDispatch();
+
   const handleLogout = () => {
-    localStorage.removeItem('accessToken');
-    window.location.assign('/login');
+    dispatch(logoutAction());
+    navigate('/login', { replace: true });
   };
 
   return (
-    <div className={cl.app_layout}>
-      <aside className={cl.sidebar}>
-        <div className={cl.brand}>Rosatom</div>
-        <nav>
-          {navigation.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/'}
-              className={({ isActive }) => isActive ? `${cl.nav_link} ${cl.active}` : cl.nav_link}
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-      </aside>
-
-      <main className={cl.mainContent}>
-        <header className={cl.appHeader}>
-          <span>Система управления ВЭУ</span>
-          <button type="button" onClick={handleLogout}>Выйти</button>
-        </header>
-        <div className={cl.pageContent}>
+    <Layout className={cl.app_layout}>
+      <Sider breakpoint="lg" collapsedWidth="0" className={cl.sidebar} width={240}>
+        <div className={cl.brand}><FireTwoTone/>  ЦРП</div>
+        <Menu
+          theme="dark"
+          selectedKeys={[location.pathname]}
+          items={navigation}
+          onClick={({ key }) => navigate(key)}
+        />
+      </Sider>
+      <Layout>
+        <Header className={cl.appHeader}>
+          <Button icon={<LogoutOutlined />} size="small" onClick={handleLogout}>Выйти</Button>
+        </Header>
+        <Content className={cl.pageContent}>
           <Outlet />
-        </div>
-      </main>
-    </div>
+        </Content>
+      </Layout>
+    </Layout>
   );
 }

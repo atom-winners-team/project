@@ -1,9 +1,10 @@
 import * as equipmentService from "../services/equipment.js";
+import * as equipmentRep from "../services/equipmentRep.js"
 
 // Получаем все оборудование
 export const getAll = async (req, res, next) => {
   try {
-    res.status(200).json(await equipmentService.getAll());
+    res.status(200).json(await equipmentRep.getAll());
   } catch (error) {
     next(error);
   }

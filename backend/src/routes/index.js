@@ -8,6 +8,7 @@ import { authenticate } from '../middlewares/authenticate.js'
 const router = Router();
 
 router.use("/auth", authRoutes);
+router.use(authenticate);
 router.use("/equipment", equipmentRoutes);
 router.use("/users", usersRoutes);
 router.use("/requests", requestsRoutes);
