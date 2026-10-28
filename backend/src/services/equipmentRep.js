@@ -1,5 +1,5 @@
 import * as equipmentRepository from '../repositories/equipment.js';
-import { importFromFixedBook } from './import.js'; // <--- путь к вашему файлу с importFromFixedBook
+import { importFromFixedBook } from './import.js';
 import { NotFoundError } from '../errors/NotFoundError.js';
 
 // Получаем все оборудование
