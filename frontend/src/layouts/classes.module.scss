@@ -1,0 +1,88 @@
+h1 {
+  margin-top: 0;
+}
+
+.app_layout {
+  min-height: 100vh;
+  display: flex;
+}
+
+.sidebar {
+  width: 240px;
+  padding: 24px 16px;
+  background: #172b4d;
+  color: white;
+}
+
+.brand {
+  margin-bottom: 32px;
+  font-size: 22px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.sidebar nav {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.nav_link {
+  padding: 10px 12px;
+  border-radius: 6px;
+  color: #dce5f3;
+  text-decoration: none;
+}
+
+.nav_link:hover,
+.nav_link.active {
+  background: #2d4b78;
+  color: white;
+}
+
+.mainContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.appHeader {
+  height: 64px;
+  padding: 0 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: white;
+  border-bottom: 1px solid #e3e7ed;
+}
+
+.appHeader button {
+  border: 0;
+  border-radius: 6px;
+  padding: 9px 16px;
+  background: #1769aa;
+  color: white;
+  cursor: pointer;
+}
+
+.pageContent {
+  padding: 24px;
+}
+
+@media (max-width: 720px) {
+  .app_layout {
+    display: block;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+
+  .sidebar nav {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+
+  .nav_link {
+    white-space: nowrap;
+  }
+}
