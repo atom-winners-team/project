@@ -1,5 +1,5 @@
 import { Router } from "express";
-import * as equipmentController from "../controllers/equipment.controller";
+import * as equipmentController from "../controllers/equipment.js";
 
 const router = Router();
 
