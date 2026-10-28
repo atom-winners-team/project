@@ -47,6 +47,10 @@ export default (sequelize) => {
         type: DataTypes.JSONB,
         allowNull: true,
       },
+      close_comment: {
+        type: DataTypes.TEXT,
+        allowNull: true,
+      },
     },
     {
       tableName: "requests",

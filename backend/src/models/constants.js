@@ -3,7 +3,9 @@ import { DataTypes } from "sequelize";
 export const STATUSES = {
   new: "new",
   in_progress: "in_progress",
+  waiting_parts: "waiting_parts",
   done: "done",
+  rejected: "rejected",
 };
 
 export const STATUSES_ENUM = DataTypes.ENUM(...Object.values(STATUSES));
