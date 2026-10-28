@@ -8,7 +8,7 @@ module.exports = {
         {
           username: 'duty1',
           fullName: 'Дежурный 1',
-          role: 'duty_officer',
+          role: 'duty',
           passwordHash: null,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -16,7 +16,7 @@ module.exports = {
         {
           username: 'engineer1',
           fullName: 'Сервисный инженер 1',
-          role: 'service_engineer',
+          role: 'engineer',
           passwordHash: null,
           createdAt: new Date(),
           updatedAt: new Date(),
@@ -24,7 +24,7 @@ module.exports = {
         {
           username: 'director1',
           fullName: 'Технический директор 1',
-          role: 'technical_director',
+          role: 'director',
           passwordHash: null,
           createdAt: new Date(),
           updatedAt: new Date(),

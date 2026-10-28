@@ -1,6 +1,6 @@
 import db from '../models/index.js';
 
-const { User } = db;
+const User = db.User;
 
 export const findById = async (id) => {
   return User.findByPk(id);
@@ -10,6 +10,9 @@ export const findByUsername = async (username) => {
   return User.findOne({
     where: { login: username },
   });
+}
+export const findByLogin = async (login) => {
+  return User.findOne({ where: { login } });
 };
 
 export const findAll = async () => {
