@@ -1,6 +1,6 @@
 import db from '../models/index.js';
 
-const { User } = db;
+const User = db.User;
 
 export const findById = async (id) => {
   return User.findByPk(id);
