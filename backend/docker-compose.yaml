@@ -17,5 +17,21 @@ services:
       retries: 10
       start_period: 10s
 
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      PG_HOST: db
+      NODE_ENV: production
+    ports:
+      - "4000:4000"
+    depends_on:
+      db:
+        condition: service_healthy
+
 volumes:
   pgdata:

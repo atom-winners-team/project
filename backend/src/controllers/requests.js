@@ -18,10 +18,8 @@ export const getById = async (req, res, next) => {
     );
 
     if (!request) {
-      return res.status(404).json({
-        message: "Заявка не найдена",
-      });
-    }
+        return next(new NotFoundError("Заявка не найдена"));
+      }
 
     res.status(200).json(request);
   } catch (error) {
