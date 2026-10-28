@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { STATUSES_ENUM, CREATION_TYPES_ENUM } from "./constants.js";
+import { STATUSES, STATUSES_ENUM, CREATION_TYPES_ENUM } from "./constants.js";
 
 export default (sequelize) => {
   const Request = sequelize.define(
@@ -21,7 +21,7 @@ export default (sequelize) => {
       status: {
         type: STATUSES_ENUM,
         allowNull: false,
-        defaultValue: STATUSES_ENUM.new,
+        defaultValue: STATUSES.new,
       },
       priority_id: {
         type: DataTypes.INTEGER,

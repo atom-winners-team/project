@@ -4,6 +4,7 @@ import * as userRepository from '../repositories/userRepository.js';
 
 import { AppError } from '../errors/AppError.js';
 import { NotFoundError } from '../errors/NotFound.js';
+import { getAuthConfig } from '../config/auth.js';
 
 const toPublicUser = (user) => {
     return {
@@ -42,7 +43,8 @@ export const create = async ({ login, password, role }) => {
         );
     }
 
-    const passwordHash = await bcrypt.hash(password, process.env.SALT_ROUNDS);
+    const { bcryptRounds } = getAuthConfig();
+    const passwordHash = await bcrypt.hash(password, bcryptRounds);
 
     try {
         const user = await userRepository.create({
