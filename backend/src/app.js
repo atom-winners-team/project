@@ -7,6 +7,7 @@ import routes from "./routes/index.js";
 import authRoutes from "./routes/auth.js";
 import { logger } from './utils/logger.js';
 import { errorHandler } from './middlewares/errorHandler.js';
+import { config } from './config/index.js';
 
 const app = express();
 
@@ -14,7 +15,7 @@ app.use(helmet());
 
 app.use(
   cors({
-    origin: process.env.CORS_ORIGIN ?? 'http://localhost:3000',
+    origin: config.corsOrigins,
   }),
 );
 

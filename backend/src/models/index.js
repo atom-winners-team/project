@@ -1,5 +1,5 @@
 import { Sequelize } from 'sequelize';
-import { readRequiredString } from '../config/env.js';
+import { config } from '../config/index.js';
 
 import Equipment from './equipment.js';
 import EquipmentHistory from './equipmentHistory.js';
@@ -13,14 +13,15 @@ import Request from './request.js';
 import TelemetrySignals from './telemetrySignals.js';
 import IncidentEpisode from './incidentEpisode.js';
 
+const databaseConfig = config.database;
 const sequelize = new Sequelize(
-  readRequiredString('PG_DATABASE'),
-  readRequiredString('PG_USER'),
-  readRequiredString('PG_PASSWORD'),
+  databaseConfig.database,
+  databaseConfig.username,
+  databaseConfig.password,
   {
-    host: readRequiredString('PG_HOST'),
-    port: Number(process.env.PG_PORT ?? 5432),
-    dialect: 'postgres',
+    host: databaseConfig.host,
+    port: databaseConfig.port,
+    dialect: databaseConfig.dialect,
     logging: false,
   },
 );
