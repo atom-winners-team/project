@@ -1,17 +1,8 @@
+import * as userService from '../services/userService.js';
 
-router.get("/", usersController.getAll); 
-router.get("/:id", usersController.getById);
-router.post("/", usersController.create);
-router.patch("/:id", usersController.update);
-
-
-import { requestService } from "../services/request.js";
-
-export const getAll = async (req, res, next) => {
+export const getAll = async (_req, res, next) => {
   try {
-    const requests = await requestService.getAll(req.query);
-
-    res.status(200).json(requests);
+    res.status(200).json(await userService.getAll());
   } catch (error) {
     next(error);
   }
@@ -19,15 +10,7 @@ export const getAll = async (req, res, next) => {
 
 export const getById = async (req, res, next) => {
   try {
-    const request = await requestService.getById(
-      req.params.id
-    );
-
-    if (!request) {
-        return next(new NotFoundError("Заявка не найдена"));
-      }
-
-    res.status(200).json(request);
+    res.status(200).json(await userService.getById(req.params.id));
   } catch (error) {
     next(error);
   }
@@ -35,12 +18,7 @@ export const getById = async (req, res, next) => {
 
 export const create = async (req, res, next) => {
   try {
-    const request = await requestService.create(
-      req.body,
-      req.user
-    );
-
-    res.status(201).json(request);
+    res.status(201).json(await userService.create(req.body));
   } catch (error) {
     next(error);
   }
@@ -48,28 +26,16 @@ export const create = async (req, res, next) => {
 
 export const update = async (req, res, next) => {
   try {
-    const request = await requestService.update(
-      req.params.id,
-      req.body,
-      req.user
-    );
-
-    res.status(200).json(request);
+    res.status(200).json(await userService.update(req.params.id, req.body));
   } catch (error) {
     next(error);
   }
 };
 
-
 export const deleteById = async (req, res, next) => {
   try {
-    const request = await requestService.update(
-      req.params.id,
-      req.body,
-      req.user
-    );
-
-    res.status(200).json(request);
+    await userService.remove(req.params.id);
+    res.status(204).end();
   } catch (error) {
     next(error);
   }
