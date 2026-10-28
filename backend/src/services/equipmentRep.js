@@ -6,7 +6,7 @@ import { NotFoundError } from '../errors/NotFoundError.js';
 export const getAll = async () => {
     const equipment = await equipmentRepository.findAll();
     if (!equipment || equipment.length === 0) {
-        // Можно вернуть пустой массив без ошибки, но если хотите 404 — раскомментируйте:
+
         // throw new NotFoundError('Оборудование не найдено');
         return [];
     }
