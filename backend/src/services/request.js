@@ -94,7 +94,7 @@ export const requestService = {
   },
 
   async getById(id) {
-    return requestRepository.findById(id);
+    return getRequestOrThrow(id);
   },
 
   async create(data, user) {
