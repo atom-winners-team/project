@@ -1,5 +1,5 @@
 import * as equipmentRepository from "../repositories/equipmentRepository.js";
-import { importFromFixedBook } from "../services/equipmentImportService.js";
+import { importFromFixedBook } from "../services/equipment.js";
 
 // Получаем все оборудование
 export const getAll = async (req, res, next) => {

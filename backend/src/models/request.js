@@ -1,8 +1,9 @@
-import { DataTypes } from 'sequelize';
+import { DataTypes } from "sequelize";
+import { STATUSES_ENUM, CREATION_TYPES_ENUM } from "./constants.js";
 
 export default (sequelize) => {
   const Request = sequelize.define(
-    'Request',
+    "Request",
     {
       id: {
         type: DataTypes.UUID,
@@ -14,13 +15,13 @@ export default (sequelize) => {
         allowNull: true,
       },
       type: {
-        type: DataTypes.ENUM('inspection', 'repair'),
+        type: CREATION_TYPES_ENUM,
         allowNull: false,
       },
       status: {
-        type: DataTypes.ENUM('new', 'in_progress', 'waiting_parts', 'done', 'rejected'),
+        type: STATUSES_ENUM,
         allowNull: false,
-        defaultValue: 'new',
+        defaultValue: STATUSES_ENUM.new,
       },
       priority_id: {
         type: DataTypes.INTEGER,
@@ -48,17 +49,23 @@ export default (sequelize) => {
       },
     },
     {
-      tableName: 'requests',
+      tableName: "requests",
       timestamps: true,
     },
   );
 
   Request.associate = (models) => {
-    Request.belongsTo(models.Equipment, { foreignKey: 'equipment_id' });
-    Request.belongsTo(models.User, { as: 'author', foreignKey: 'author_id' });
-    Request.belongsTo(models.User, { as: 'assignee', foreignKey: 'assignee_id' });
-    Request.belongsTo(models.DictPriorities, { as: 'priority', foreignKey: 'priority_id' });
-    Request.hasOne(models.IncidentEpisode, { foreignKey: 'request_id' });
+    Request.belongsTo(models.Equipment, { foreignKey: "equipment_id" });
+    Request.belongsTo(models.User, { as: "author", foreignKey: "author_id" });
+    Request.belongsTo(models.User, {
+      as: "assignee",
+      foreignKey: "assignee_id",
+    });
+    Request.belongsTo(models.DictPriorities, {
+      as: "priority",
+      foreignKey: "priority_id",
+    });
+    Request.hasOne(models.IncidentEpisode, { foreignKey: "request_id" });
   };
 
   return Request;

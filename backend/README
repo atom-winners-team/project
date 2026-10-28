@@ -6,14 +6,21 @@
 
 ## Настройка
 1. Установить зависимости: `npm install`
-2. Настроить `.env` при необходимости
-3. Применить миграции: `npx sequelize-cli db:migrate`
-4. Применить сиды (опционально): `npx sequelize-cli db:seed:all`
+2. Настроить `.env`: `PG_DATABASE`, `PG_USER`, `PG_PASSWORD`, `ACCESS_TOKEN_SECRET` (не менее 32 символов); опционально `PG_HOST`, `PG_PORT`, `ACCESS_TOKEN_TTL_SECONDS`, `BCRYPT_ROUNDS`
+3. Запустить PostgreSQL: `docker compose up -d db`
+4. Применить миграции: `npx sequelize-cli db:migrate`
+5. Применить сиды (опционально): `npx sequelize-cli db:seed:all`
+
+## Авторизация
+- `POST /register` с `{ "login": "user1", "password": "минимум 8 символов" }` создаёт пользователя с ролью `duty`.
+- `POST /login` с теми же логином и паролем возвращает JWT.
+- Те же операции доступны по адресам `POST /api/auth/register` и `POST /api/auth/login`.
+- Для запросов к `/api/equipment` и `/api/requests` передавайте `Authorization: Bearer <accessToken>`.
 
 ## Импорт книги оборудования
 Импорт фиксированной книги запускается скрыто/командой. Пример вызова через API:
 `POST /api/equipment/import` с body `{ "filePath": "path/to/book.xlsx" }`
-Или через сервис `importFromFixedBook(filePath)` из `src/services/equipmentImportService.js`.
+Или через сервис `importFromFixedBook(filePath)` из `src/services/equipment.js`.
 
 ## Учётные записи (для демонстрации)
 - duty1 (Дежурный, duty_officer)
